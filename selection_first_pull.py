@@ -4,7 +4,7 @@ from openpyxl import Workbook
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-term = "202401"
+term = "test"
 
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
