@@ -1,0 +1,5 @@
+*.csv
+*.xlsx
+*.ipynb
+*.docx
+past_terms/
