@@ -3,3 +3,4 @@
 *.ipynb
 *.docx
 past_terms/
+**/.DS_Store
