@@ -34,13 +34,13 @@ print("All acq length (unique books owned or purchased): ", len(acq))
 # fill Term_cda
 acq["Term_cda"].fillna(f"{term}", inplace=True)
 
-# Merge Data from Duck Store with Acq Data
+# Merge Data from Book Store with Acquisition Data
 print("DS data length: ",len(ds))
 
 # remove no eBook Allowed titles
 ds = ds[ds["No eBook Allowed"] !="Yes"]
 
-# merge DS data and acq data
+# merge Book Store data and acq data
 df_main = ds.merge(acq,
                      on = "ISBN",
                      how = 'outer')
@@ -83,12 +83,7 @@ flag_dif_col(matching, 'Title_cda', 'Title_ds', 'title_flag')
 matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching.xlsx"))
 print("All matching length: ", len(matching))
 
-'''
-# this doesn't really make sense now that I use the full data
-values = {"Purchased?":"no"} 
-df_main = df_main.fillna(value = values)    # replace NaN with "no" in "Purcahsed?"
-df_main.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_ALL_TITLES.xlsx")) # save for QC and matching for next term
-'''
+
 # print some stats -- could save them instead
 
 owned_access_total = len(acq_own)

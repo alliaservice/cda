@@ -9,7 +9,6 @@ term = "202401"
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
 second_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/second_all_titles.xlsx"))
-#print(past_cda.head())
 
 print("first pull: ", len(first_p))
 print("second pull: ",len(second_p))
@@ -20,9 +19,6 @@ first_p['flag'] = 'y' # add simple flag column to use to exclude after merge
 first_p = first_p[["ISBN", "flag"]] # keep only a few cols
 first_p = first_p.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so merge works as expected
 
-#print(first_p.tail())
-#print(len(first_p))
-
 
 # merge first_p and second_p, keep only second_pull 
 
@@ -30,7 +26,6 @@ df_main = second_p.merge(first_p,
                      on = "ISBN",
                      how = 'left')
 
-#print(df_main.head())
 print("len after first/second merge: ", len(df_main))
 
 # select only non_matching rows (ie second pull only titles)

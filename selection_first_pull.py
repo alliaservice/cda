@@ -8,7 +8,7 @@ term = "test"
 
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
-#print(past_cda.head())
+
 
 print("first pull: ", len(first_p))
 
