@@ -19,7 +19,7 @@ CRN = 'CRN' # course section unique id
 sec = 'Sec' # course section number ie the '101' in HIST 101
 instructor_email = 'Instructor Email'
 ISBN = 'ISBN'
-instructor = 'Instructor' # instructor name (lastname, firstname)
+instructor_name = 'Instructor' # instructor name (lastname, firstname)
 ebook_link = 'LibSearch Link'
 print_link = 'print_libsearch_link'  # print catalog link, if available
 internal_id = 'Internal ID'  # unique identifier for books, can remove
@@ -94,6 +94,20 @@ def conditional_col(new_col_name:str, df, condition_col:str, search_text:list, e
                 pass
             #else:
                 #df.at[i, new_col_name] = else_text
+def concat_cols(new_col:str, df, col1:str, col2:str, join_ch:str):
+    '''
+    concatenates the values in two columns into one column as a string, seperated
+    by a join character (make '' for no seperation), the original columns
+    are left unchanged, and the new column is added to the dataframe. The values
+    in both columns are converted to strings.
+
+    new_col = name of new column
+    df = dataframe
+    col1 = name of first column to concatenate, must contain strings or ints
+    col2 = name of second column to concatenate, must contain strings or ints
+    join_ch = character to join on, ie ';' or ' '
+    '''
+    df[new_col] = df[col1].astype(str) + join_ch + df[col2].astype(str)
 def add_frq(df, col:str):
     '''
     df: dataframe you want to add a freq column to
@@ -173,7 +187,7 @@ create_dir(abs_pth, output_dir)
 conditional_col('license_text', qc_matching, DRM, license_search_list, 'limited user license')
 
 # add course number column
-qc_matching["Course_Number"] = qc_matching[dept] + " " + qc_matching[sec].astype(str)
+concat_cols('Course_Number', qc_matching, 'Dept', 'Sec', ' ')
 len_before_dedupe = len(qc_matching) # get length for check later
 
 # aggregate course numbers for books used by the same instructor in mulitple courses (eg 4/500)
@@ -203,7 +217,7 @@ qc_matching = qc_matching.sort_values("CRN_freq")
 
 # add instructor first-name last-name 
 #qc_matching['instructor_full_name'] = qc_matching.Instructor.str.split(', ').map(lambda x : ' '.join(x[::-1])) # adds one full name col instead
-qc_matching[['instructor_last_name', 'instructor_first_name']] = qc_matching.Instructor.str.split(', ', expand=True) 
+qc_matching[['instructor_last_name', 'instructor_first_name']] = qc_matching[instructor_name].str.split(', ', expand=True) 
 
 # add print link conditional col to include as linked text in emails
 # rows without links must be blank
