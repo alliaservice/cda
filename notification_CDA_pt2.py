@@ -205,8 +205,8 @@ qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_output.xlsx'))
 
 # turn into mulitple horizontal files based on instructor
 # slice full data to only get columns needed for sending the emails
-t_grouped = qc_matching.loc[:, cols_to_keep]
-t_grouped = t_grouped.applymap(str) # avoid join error by joining ints
+qc_matching = qc_matching.loc[:, cols_to_keep]
+qc_matching = qc_matching.applymap(str) # avoid join error by joining ints
 
 # split by instructor_email_freq and then group by instructor email explode horiontally and save to excel
 #horizontal_explode(t_grouped, 'instructor_email_freq', ['instructor_email', 'instructor_full_name']
