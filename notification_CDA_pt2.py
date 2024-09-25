@@ -4,7 +4,7 @@ import sys
 
 # define variables
 term = "test2"
-#term_int = int(term)
+term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
 output_dir_path = os.path.join(abs_pth, output_dir)
@@ -201,7 +201,6 @@ qc_matching = pd.merge(qc_matching, isbn_instr_grouped, how='left', on=["instruc
 
 
 # remove duplicate rows on ISBN and Instructor (instructors using the same book in mulitple sections) 
-
 qc_matching = qc_matching.sort_values('Course_Number')
 print("Before removeing duplicate ISBN & Instructor, df len is: ",len(qc_matching))
 qc_matching = qc_matching.groupby(["instructor_email", "ISBN"]).first().reset_index()
@@ -230,7 +229,7 @@ qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_full.xlsx'))
 
 # save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
 # identical to acquisitions list, but nicely pre-formatted. 
-#save_cda_list(qc_matching,term_int, output_dir_path, save_cda_cols, 'Term_cda')
+save_cda_list(qc_matching,term_int, output_dir_path, save_cda_cols, 'Term_cda')
 
 # slice full data to only get columns needed for sending the emails
 book_list = qc_matching.loc[:, cols_to_keep]
