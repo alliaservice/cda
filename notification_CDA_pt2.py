@@ -4,7 +4,7 @@ import sys
 
 # define variables
 term = "test2"
-term_int = int(term)
+#term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output_TESTING'
 output_dir_path = os.path.join(abs_pth, output_dir)
@@ -13,7 +13,7 @@ output_dir_path = os.path.join(abs_pth, output_dir)
 qc_matching = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching_clean.xlsx"))
 
 # cols to keep for horizonal x_emails files, update email_cols as well for changes
-cols_to_keep = ['instructor_email', 'Title_x', 'instructor_full_name', 
+cols_to_keep = ['instructor_email', 'Title_x', 'instructor_first_name', 'instructor_last_name',
                 'LibSearch Link','print_link?','print_libsearch_link', 'DRM',
                 'Purchased?', 'course_numbers', 'license_text', 'CRN_freq', 
                 'instructor_email_freq', 'CRN']
@@ -173,8 +173,8 @@ isbn_instr_grouped = (qc_matching.groupby(["Instructor Email", "ISBN"])
 qc_matching = pd.merge(qc_matching, isbn_instr_grouped, how='left', on=["Instructor Email", "ISBN"])
 
 
-# remove duplicate ISBN and Instructor rows (before adding freq columns)
-# there definitely a better way to do this in just one step (combined above.
+# remove duplicate rows on ISBN and Instructor (instructors using the same book in mulitple sections) 
+
 qc_matching = qc_matching.sort_values('Course_Number')
 print("Before removeing duplicate ISBN & Instructor, df len is: ",len(qc_matching))
 qc_matching = qc_matching.groupby(["Instructor Email", "ISBN"]).first().reset_index()
@@ -191,8 +191,8 @@ qc_matching = qc_matching.sort_values("instructor_email")
 qc_matching = qc_matching.sort_values("CRN_freq")
 
 # add instructor full name to get first-name last-name 
-# (to split into two cols get rid of .map and add expand=True to split & add 2 cols)
-qc_matching['instructor_full_name'] = qc_matching.Instructor.str.split(', ').map(lambda x : ' '.join(x[::-1]))
+#qc_matching['instructor_full_name'] = qc_matching.Instructor.str.split(', ').map(lambda x : ' '.join(x[::-1])) # adds one full name col instead
+qc_matching[['instructor_last_name', 'instructor_first_name']] = qc_matching.Instructor.str.split(', ', expand=True) 
 
 # add print link conditional col
 qc_matching['print_libsearch_link'].fillna(" ", inplace=True) 
@@ -207,10 +207,19 @@ qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_output.xlsx'))
 save_cda_list(qc_matching,term_int, output_dir_path, ['Title_y', 'ISBN', 'Purchased?', 
                 'LibSearch Link', 'DRM', 'Term_cda', 'print_libsearch_link'], 'Term_cda')
 
-# turn into mulitple horizontal files based on instructor
 # slice full data to only get columns needed for sending the emails
-qc_matching = qc_matching.loc[:, cols_to_keep]
-qc_matching = qc_matching.applymap(str) # avoid join error by joining ints
+email_list = qc_matching.loc[:, cols_to_keep]
+email_list = email_list.applymap(str) # avoid join error by joining ints
+
+
+join_ch= ';'
+email_list = email_list.groupby(['instructor_email','instructor_first_name', 'instructor_last_name', 'instructor_email_freq'])[email_cols].agg(join_ch.join)
+conditional_col('limit_explanation', email_list, 'license_text', limit_ex_search, limit_ex_else)
+print(email_list.head())
+email_list.to_excel(os.path.join(output_dir_path,'testing_POST.xlsx'))
+
+
+
 
 # split by instructor_email_freq and then group by instructor email explode horiontally and save to excel
 #horizontal_explode(t_grouped, 'instructor_email_freq', ['instructor_email', 'instructor_full_name']
