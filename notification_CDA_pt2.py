@@ -4,7 +4,7 @@ import sys
 
 # define variables
 term = "202304"
-term_int = 202304
+term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
 output_dir_path = os.path.join(abs_pth, output_dir)
@@ -99,7 +99,7 @@ def horizontal_explode(df, group1:str, group_2:list, cols:list, join_ch:str, out
     join_ch ; string/character to join on and then split on, ex: ";"
     output_file = the output file name in excel format, concated with group number ie {1}_book_emails.xlsx
     flag_search: used in conditional_col call for the search text, adding a limited license explaination
-    flag_else: used in conditional call, adds the default unlimited license explaination
+    flag_else: used in conditional col, adds the default unlimited license explaination
     '''
     # first form large groups of instr_freq -- each output file = 1 group
     df = df.groupby(group1)
@@ -137,7 +137,6 @@ def save_deleted_rows(df_removed, df_dupes, cols:list, path, file_name:str):
                         how='outer', on=cols, indicator=True )
     df_dupes = df_dupes.groupby('_merge').get_group('left_only')
     df_dupes.to_excel(os.path.join(path, file_name))
-
 def save_cda_list(df, term_code:int, output:str, cols:list, check_col:str, ):
     '''
     df: dataframe
@@ -162,9 +161,9 @@ conditional_col('license_text', qc_matching, 'DRM', license_search_list, 'limite
 # add course number column
 qc_matching["Course_Number"] = qc_matching['Dept'] + " " + qc_matching['Sec'].astype(str)
 
-len_before_dedupe = len(qc_matching) # get length now for QC/error check at the end
+len_before_dedupe = len(qc_matching) # get length for check later
 
-# group by ISBN AND instructor email so I can add aggregate course number info in
+# group by ISBN AND instructor email to add aggregate course number info
 qc_matching = qc_matching.sort_values('Course_Number') # sort before so course number in correct order
 qc_matching_dupes = qc_matching # save a copy w/ dupes for use later
 isbn_instr_grouped = (qc_matching.groupby(["Instructor Email", "ISBN"])
@@ -173,8 +172,9 @@ isbn_instr_grouped = (qc_matching.groupby(["Instructor Email", "ISBN"])
 
 qc_matching = pd.merge(qc_matching, isbn_instr_grouped, how='left', on=["Instructor Email", "ISBN"])
 
+
 # remove duplicate ISBN and Instructor rows (before adding freq columns)
-# there is def a better way to do this in just one step (combined above) but I haven't figured it out.
+# there definitely a better way to do this in just one step (combined above.
 qc_matching = qc_matching.sort_values('Course_Number')
 print("Before removeing duplicate ISBN & Instructor, df len is: ",len(qc_matching))
 qc_matching = qc_matching.groupby(["Instructor Email", "ISBN"]).first().reset_index()
@@ -209,15 +209,15 @@ t_grouped = qc_matching.loc[:, cols_to_keep]
 t_grouped = t_grouped.applymap(str) # avoid join error by joining ints
 
 # split by instructor_email_freq and then group by instructor email explode horiontally and save to excel
-horizontal_explode(t_grouped, 'instructor_email_freq', ['instructor_email', 'instructor_full_name']
-                   ,email_cols, "; ", '_book_emails.xlsx',limit_ex_search, limit_ex_else )
+#horizontal_explode(t_grouped, 'instructor_email_freq', ['instructor_email', 'instructor_full_name']
+                   #,email_cols, "; ", '_book_emails.xlsx',limit_ex_search, limit_ex_else )
 
 
 # save a copy of de-duped / deleted rows
 qc_matching_dupes = qc_matching_dupes.rename(columns={"Instructor Email": "instructor_email"})
-save_deleted_rows(qc_matching, qc_matching_dupes, 
-                  ['instructor_email', 'Internal ID', 'CRN', 'ISBN']
-                  , output_dir_path, 'deleted_dupes.xlsx')
+#save_deleted_rows(qc_matching, qc_matching_dupes, 
+                  #['instructor_email', 'Internal ID', 'CRN', 'ISBN']
+                  #, output_dir_path, 'deleted_dupes.xlsx')
 # save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
 # identical to acquisitions list, but nicely pre-formatted. 
 save_cda_list(qc_matching,term_int, output_dir_path, ['Title_y', 'ISBN', 'Purchased?', 

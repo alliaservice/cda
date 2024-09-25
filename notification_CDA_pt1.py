@@ -83,7 +83,6 @@ flag_dif_col(matching, 'Title_cda', 'Title_ds', 'title_flag')
 matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching.xlsx"))
 print("All matching length: ", len(matching))
 
-
 # print some stats -- could save them instead
 
 owned_access_total = len(acq_own)
