@@ -4,7 +4,7 @@ import sys
 
 # define variables
 term = "test2"
-term_int = int(term)
+#term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
 output_dir_path = os.path.join(abs_pth, output_dir)
@@ -12,12 +12,27 @@ output_dir_path = os.path.join(abs_pth, output_dir)
 # read data
 qc_matching = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching_clean.xlsx"))
 
+# define column names (UPDATE HERE)
+DRM = 'DRM' # DRM/license info column
+dept = 'Dept' # department name or code ie the 'HIST' in HIST 101
+CRN = 'CRN' # course section unique id
+sec = 'Sec' # course section number ie the '101' in HIST 101
+instructor_email = 'Instructor Email'
+ISBN = 'ISBN'
+instructor = 'Instructor' # instructor name (lastname, firstname)
+ebook_link = 'LibSearch Link'
+print_link = 'print_libsearch_link'  # print catalog link, if available
+internal_id = 'Internal ID'  # unique identifier for books, can remove
+
+
 # cols to keep for notifications: cols_to_keep is for both book list and email list, email_cols is for email only
 cols_to_keep = ['instructor_email', 'Title_x', 'instructor_first_name', 'instructor_last_name',
-                'LibSearch Link','print_link?','print_libsearch_link', 'DRM',
+                ebook_link,'print_link?',print_link, DRM,
                 'Purchased?', 'course_numbers', 'license_text', 'CRN_freq', 
-                'instructor_email_freq', 'CRN']
-email_cols = ['Title_x', 'course_numbers', 'license_text','CRN']
+                'instructor_email_freq', CRN]
+email_cols = ['Title_x', 'course_numbers', 'license_text', CRN]
+save_cda_cols = ['Title_y', ISBN, 'Purchased?', 
+                ebook_link, DRM, 'Term_cda', print_link]
 
 # vars for license text for emails, used in horizontal explode func, call to conditional col
 limit_ex_search = [['cop', ("A limited license means that the library wasn't able to purchase unlimited " 
@@ -155,20 +170,20 @@ def save_cda_list(df, term_code:int, output:str, cols:list, check_col:str, ):
 create_dir(abs_pth, output_dir)
 
 # add license text conditional col
-conditional_col('license_text', qc_matching, 'DRM', license_search_list, 'limited user license')
+conditional_col('license_text', qc_matching, DRM, license_search_list, 'limited user license')
 
 # add course number column
-qc_matching["Course_Number"] = qc_matching['Dept'] + " " + qc_matching['Sec'].astype(str)
+qc_matching["Course_Number"] = qc_matching[dept] + " " + qc_matching[sec].astype(str)
 len_before_dedupe = len(qc_matching) # get length for check later
 
 # aggregate course numbers for books used by the same instructor in mulitple courses (eg 4/500)
 qc_matching = qc_matching.sort_values('Course_Number')  # sort before so course number in correct order
-qc_matching = qc_matching.rename(columns={"Instructor Email": "instructor_email"}) # rename for ease 
+qc_matching = qc_matching.rename(columns={instructor_email: "instructor_email"}) # rename for ease 
 qc_matching_dupes = qc_matching  # save a copy w/ dupes for use later
 isbn_instr_grouped = (qc_matching.groupby(["instructor_email", "ISBN"])  # group by book and instrutor
         .agg({'Course_Number': lambda x: "/".join(x)})
         .rename({'Course_Number': 'course_numbers'}, axis=1).reset_index())
-qc_matching = pd.merge(qc_matching, isbn_instr_grouped, how='left', on=["instructor_email", "ISBN"])
+qc_matching = pd.merge(qc_matching, isbn_instr_grouped, how='left', on=["instructor_email", ISBN])
 
 
 # remove duplicate rows on ISBN and Instructor (instructors using the same book in mulitple sections) 
@@ -180,7 +195,7 @@ print("After removing dupes, df len is", len(qc_matching),'\n')
 
 
 # add CRN_freq and instructor_email_freq
-qc_matching = add_frq(qc_matching, "CRN")
+qc_matching = add_frq(qc_matching, CRN)
 qc_matching = add_frq(qc_matching, "instructor_email")
 # sort df
 qc_matching = qc_matching.sort_values("instructor_email")
@@ -193,16 +208,15 @@ qc_matching[['instructor_last_name', 'instructor_first_name']] = qc_matching.Ins
 # add print link conditional col to include as linked text in emails
 # rows without links must be blank
 # replace null values with spaces (for loop + groupby requires)
-qc_matching['print_libsearch_link'].fillna(" ", inplace=True) 
-conditional_col('print_link?', qc_matching, 'print_libsearch_link', [['http', 'print link']], ' ')
+qc_matching[print_link].fillna(" ", inplace=True) 
+conditional_col('print_link?', qc_matching, print_link, [['http', 'print link']], ' ')
 
 # save a full copy of cleaned up and filtered list for convinient access to full list of emails & books
 qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_full.xlsx'))
 
 # save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
 # identical to acquisitions list, but nicely pre-formatted. 
-save_cda_list(qc_matching,term_int, output_dir_path, ['Title_y', 'ISBN', 'Purchased?', 
-                'LibSearch Link', 'DRM', 'Term_cda', 'print_libsearch_link'], 'Term_cda')
+#save_cda_list(qc_matching,term_int, output_dir_path, save_cda_cols, 'Term_cda')
 
 # slice full data to only get columns needed for sending the emails
 book_list = qc_matching.loc[:, cols_to_keep]
@@ -224,5 +238,5 @@ email_list.to_excel(os.path.join(output_dir_path,f'{term}_emails.xlsx'))
 
 # save a copy of de-duped / deleted rows
 save_deleted_rows(qc_matching, qc_matching_dupes, 
-                  ['instructor_email', 'Internal ID', 'CRN', 'ISBN']
+                  ['instructor_email', internal_id, CRN, ISBN]
                   , output_dir_path, 'deleted_dupes.xlsx')
