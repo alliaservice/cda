@@ -3,10 +3,10 @@ import os
 import sys
 
 # define variables
-term = "202304"
+term = "test2"
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-output_dir = f'notification_{term}/script2_output'
+output_dir = f'notification_{term}/script2_output_TESTING'
 output_dir_path = os.path.join(abs_pth, output_dir)
 
 # read data
@@ -202,6 +202,10 @@ conditional_col('print_link?', qc_matching, 'print_libsearch_link', [['http', 'p
 # save a full copy of cleaned up and filtered list for convinient access to full list of emails
 qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_output.xlsx'))
 
+# save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
+# identical to acquisitions list, but nicely pre-formatted. 
+save_cda_list(qc_matching,term_int, output_dir_path, ['Title_y', 'ISBN', 'Purchased?', 
+                'LibSearch Link', 'DRM', 'Term_cda', 'print_libsearch_link'], 'Term_cda')
 
 # turn into mulitple horizontal files based on instructor
 # slice full data to only get columns needed for sending the emails
@@ -218,7 +222,3 @@ qc_matching_dupes = qc_matching_dupes.rename(columns={"Instructor Email": "instr
 #save_deleted_rows(qc_matching, qc_matching_dupes, 
                   #['instructor_email', 'Internal ID', 'CRN', 'ISBN']
                   #, output_dir_path, 'deleted_dupes.xlsx')
-# save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
-# identical to acquisitions list, but nicely pre-formatted. 
-save_cda_list(qc_matching,term_int, output_dir_path, ['Title_y', 'ISBN', 'Purchased?', 
-                'LibSearch Link', 'DRM', 'Term_cda', 'print_libsearch_link'], 'Term_cda')
