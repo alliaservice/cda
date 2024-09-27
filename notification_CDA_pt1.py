@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202304" # term is used in file paths throughout
+term = "202401" # term is used in file paths throughout
 
 # get absolute path
 abs_pth = os.path.dirname(os.path.abspath(__file__))

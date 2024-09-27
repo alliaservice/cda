@@ -3,7 +3,7 @@ import os
 import sys
 
 # define variables
-term = "test2"
+term = "202401"
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
@@ -11,6 +11,7 @@ output_dir_path = os.path.join(abs_pth, output_dir)
 
 # read data
 qc_matching = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching_clean.xlsx"))
+not_clearned = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching.xlsx"))
 
 # define column names (UPDATE HERE)
 DRM = 'DRM' # DRM/license info column
@@ -229,7 +230,7 @@ qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_full.xlsx'))
 
 # save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
 # identical to acquisitions list, but nicely pre-formatted. 
-save_cda_list(qc_matching,term_int, output_dir_path, save_cda_cols, 'Term_cda')
+save_cda_list(not_clearned,term_int, output_dir_path, save_cda_cols, 'Term_cda')
 
 # slice full data to only get columns needed for sending the emails
 book_list = qc_matching.loc[:, cols_to_keep]
