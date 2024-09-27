@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202304" # term is used in file paths throughout
+term = "202401" # term is used in file paths throughout
 
 # get absolute path
 abs_pth = os.path.dirname(os.path.abspath(__file__))
@@ -82,7 +82,6 @@ flag_dif_col(matching, 'Title_cda', 'Title_ds', 'title_flag')
 # save for QC and use in next script
 matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching.xlsx"))
 print("All matching length: ", len(matching))
-
 
 # print some stats -- could save them instead
 
