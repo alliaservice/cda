@@ -11,7 +11,7 @@ output_dir_path = os.path.join(abs_pth, output_dir)
 
 # read data
 qc_matching = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching_clean.xlsx"))
-not_clearned = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching.xlsx"))
+not_cleaned = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching.xlsx"))
 
 # define column names (UPDATE HERE)
 DRM = 'DRM' # DRM/license info column
@@ -34,6 +34,7 @@ cols_to_keep = ['instructor_email', 'Title_x', 'instructor_first_name', 'instruc
 email_cols = ['Title_x', 'course_numbers', 'license_text', CRN]
 save_cda_cols = ['Title_y', ISBN, 'Purchased?', 
                 ebook_link, DRM, 'Term_cda', print_link]
+save_cda_group = ['Title_y', ISBN,]
 
 # vars for license text for emails, used in horizontal explode func, call to conditional col
 limit_ex_search = [['cop', ("A limited license means that the library wasn't able to purchase unlimited " 
@@ -118,38 +119,6 @@ def add_frq(df, col:str):
     '''
     df[f'{col}_freq'] = df.groupby(col)[col].transform('count')
     return df           
-def horizontal_explode(df, group1:str, group_2:list, cols:list, join_ch:str, 
-                       output_file:str, flag_search, flag_else):
-    '''
-    df = df to group
-    group1 = name of first col to group by, should be 'instructor_email_freq' 
-    group2 = second cols to group by, could be a string, but expect a list of two cols
-    cols = cols to include in output horizontal file, should be a list of col names 
-    join_ch ; string/character to join on and then split on, ex: ";"
-    output_file = the output file name in excel format, concated with group number ie {1}_book_emails.xlsx
-    flag_search: used in conditional_col call for the search text, adding a limited license explaination
-    flag_else: used in conditional col, adds the default unlimited license explaination
-    '''
-    # first form large groups of instr_freq -- each output file = 1 group
-    df = df.groupby(group1)
-    x_len = 0
-    for name, group in df:
-        x = group.groupby(group_2)[cols].agg(join_ch.join)
-    # iterate over each col, and explode horizontally, add prefixes for exploded cols
-        for col in x.columns:
-            x = x.join(x[col].str.split(join_ch, expand=True).add_prefix(f'{col}_'))
-       
-        # print some stats
-        print("group:",name, len(x.index),'total instructors')
-        x_len = x_len + len(x.index)
-
-        # add an explaination of the license type
-        conditional_col('limit_explanation', x, 'license_text', flag_search, flag_else)
-
-        # send to excel, file name based on group1
-        x.to_excel(os.path.join(output_dir_path, f'{name}'+ output_file))
-
-    print('Total unique instructors to email:',x_len)  
 def save_deleted_rows(df_removed, df_dupes, cols:list, path, file_name:str):
     '''
     df_removed: df after filtering to remove duplicate rows (qc_matching)
@@ -166,21 +135,24 @@ def save_deleted_rows(df_removed, df_dupes, cols:list, path, file_name:str):
                         how='outer', on=cols, indicator=True )
     df_dupes = df_dupes.groupby('_merge').get_group('left_only')
     df_dupes.to_excel(os.path.join(path, file_name))
-def save_cda_list(df, term_code:int, output:str, cols:list, check_col:str, ):
+def save_cda_list(df, term_code:int, output:str, cols:list, group_cols:list, check_col:str):
     '''
     df: dataframe
     term_code: integer version of current term
     output: output directory path
     cols: list of columns to include in cda list
+    group_cols: columns to group by (must contain unique values, no blanks)
     check_col: name of col to look for term_code in (ie 'Term_cda')
     this function always slices dataframe to grab rows that match 
     term_code and columns in cols list. Then dedupes on cols and saves 
     output as save_cda_term_code.xlsx
     '''
     x = df.loc[df[check_col] == term_code][cols]
-    x = x.groupby(cols).first().reset_index()
-    x.to_excel(os.path.join(output,f'save_cda_{term_code}.xlsx'))
+    print(len(x))
+    x = x.groupby(group_cols).first().reset_index()
+    print("Save cda list (should equal acq + purchased): ",len(x))
 
+    x.to_excel(os.path.join(output,f'save_cda_{term_code}.xlsx'))
 # create output directory
 create_dir(abs_pth, output_dir)
 
@@ -230,7 +202,7 @@ qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_full.xlsx'))
 
 # save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
 # identical to acquisitions list, but nicely pre-formatted. 
-save_cda_list(not_clearned,term_int, output_dir_path, save_cda_cols, 'Term_cda')
+save_cda_list(not_cleaned,term_int, output_dir_path, save_cda_cols, save_cda_group, 'Term_cda')
 
 # slice full data to only get columns needed for sending the emails
 book_list = qc_matching.loc[:, cols_to_keep]
