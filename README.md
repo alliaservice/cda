@@ -2,7 +2,7 @@ These scripts partially automate several steps in the library eBooks for courses
 
 First a disclaimer: I learned python for this project, so there are lots of inefficiencies in my code and I'm sure there are many ways to improve the workflow. The entire project is a work in progress, and I will continue to improve it as I learn more. I'll outline my planned changes below.
 
-# Summary
+# Overview
 
 To understand the scripts, some background on how the library eBooks for courses purchasing program works is helpful. 
 
