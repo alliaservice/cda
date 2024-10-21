@@ -14,10 +14,10 @@ abs_pth = os.path.dirname(os.path.abspath(__file__))
 acq_own = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_CDA_acq_own.xlsx"))
 acq_purchased = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_CDA_acq_purchased.xlsx"))
 acq_past = pd.read_excel(os.path.join(abs_pth, "all_titles_purchased_not_purchased.xlsx"))
-ds = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_full_ds.xlsx"))
+bookstore = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_full_ds.xlsx"))
 print("DS data length: ",len(ds))
 
-#print(ds.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
+#print(bookstore.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
 
 # add purchased column based on file name
 acq_own["Purchased?"] = "owned/access"
@@ -27,26 +27,26 @@ acq_purchased["Purchased?"] = "purchased"
 acq_past= acq_past.rename(columns={"Title_cda" : "Title"})
 acq_past = acq_past.loc[(acq_past["Purchased?"]!= "no")]
 
-# Append acq data into one dataframe
+# Append acquisitions data into one dataframe
 acq = pd.concat([acq_own, acq_purchased, acq_past])
 print("All acq length (unique books owned or purchased): ", len(acq))
 
 # fill Term_cda
-acq["Term_cda"].fillna(f"{term}", inplace=True)
+acq["Term_cda"].fillna(term, inplace=True)
 
 # Merge Data from Book Store with Acquisition Data
-print("DS data length: ",len(ds))
+print("DS data length: ",len(bookstore))
 
 # remove no eBook Allowed titles
-ds = ds[ds["No eBook Allowed"] !="Yes"]
+bookstore = bookstore[bookstore["No eBook Allowed"] !="Yes"]
 
-# merge Book Store data and acq data
-df_main = ds.merge(acq,
+# merge Book Store data and acqusitions data
+matching = bookstore.merge(acq,
                      on = "ISBN",
                      how = 'outer')
-print("all merged titles length: ", len(df_main))
+print("all merged titles length: ", len(matching))
                     
-matching = df_main[~df_main["DRM"].isna()] #select only rows in column 'DRM' with values-- 
+matching = matching[~matching["DRM"].isna()] #select only rows in column 'DRM' with values-- 
 # only rows with matching acq record
 matching = matching.sort_values("DRM")
 
