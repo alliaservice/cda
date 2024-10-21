@@ -55,6 +55,7 @@ matching['Title_cda'] = matching['Title_y'].str.lower()
 matching['Title_ds'] = matching['Title_x'].str.lower()
 matching['Title_ds'] = matching["Title_ds"].fillna("no DS record")
 
+
 def flag_dif_col(df, col_1, col_2, new_col):
     '''
     df: dataframe
