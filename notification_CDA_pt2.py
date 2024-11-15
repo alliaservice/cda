@@ -31,12 +31,12 @@ cols_to_keep = ['instructor_email', 'Title_x', 'instructor_first_name', 'instruc
                 ebook_link,'print_link?',print_link, DRM,
                 'Purchased?', 'course_numbers', 'license_text', 'CRN_freq', 
                 'instructor_email_freq', CRN]
-email_cols = ['Title_x', 'course_numbers', 'license_text', CRN]
+email_cols = ['course_numbers', 'license_text', CRN]
 save_cda_cols = ['Title_y', ISBN, 'Purchased?', 
                 ebook_link, DRM, 'Term_cda', print_link]
 save_cda_group = ['Title_y', ISBN,]
 
-# vars for license text for emails, used in horizontal explode func, call to conditional col
+# vars for license text for emails
 limit_ex_search = [['cop', ("A limited license means that the library wasn't able to purchase unlimited " 
                    "access to the title. If too many students try to access the title at the same time, "
                    "some will be denied access. If we notice that lots of students are trying to access "
