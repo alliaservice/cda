@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202401" # term is used in file paths throughout
+term = "1" # term is used in file paths throughout
 
 # get absolute path
 abs_pth = os.path.dirname(os.path.abspath(__file__))
@@ -15,7 +15,7 @@ acq_own = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_CDA_a
 acq_purchased = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_CDA_acq_purchased.xlsx"))
 acq_past = pd.read_excel(os.path.join(abs_pth, "all_titles_purchased_not_purchased.xlsx"))
 bookstore = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_full_ds.xlsx"))
-print("DS data length: ",len(ds))
+print("DS data length: ",len(bookstore))
 
 #print(bookstore.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
 
