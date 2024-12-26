@@ -5,7 +5,14 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "1" # term is used in file paths throughout
+term = "202402" # term is used in file paths throughout
+
+# define column names (UPDATE HERE)
+DRM = 'DRM' # DRM/license info column
+CRN = 'CRN' # course section unique id
+ISBN = 'ISBN'
+no_ebook = 'No eBook Allowed'
+title = "Title" 
 
 # get absolute path
 abs_pth = os.path.dirname(os.path.abspath(__file__))
@@ -24,7 +31,7 @@ acq_own["Purchased?"] = "owned/access"
 acq_purchased["Purchased?"] = "purchased"
 
 # clean past purchased CDA
-acq_past= acq_past.rename(columns={"Title_cda" : "Title"})
+acq_past= acq_past.rename(columns={"Title_cda" : title})
 acq_past = acq_past.loc[(acq_past["Purchased?"]!= "no")]
 
 # Append acquisitions data into one dataframe
@@ -38,17 +45,17 @@ acq["Term_cda"].fillna(term, inplace=True)
 print("DS data length: ",len(bookstore))
 
 # remove no eBook Allowed titles
-bookstore = bookstore[bookstore["No eBook Allowed"] !="Yes"]
+bookstore = bookstore[bookstore[no_ebook] !="Yes"]
 
 # merge Book Store data and acqusitions data
 matching = bookstore.merge(acq,
-                     on = "ISBN",
+                     on = ISBN,
                      how = 'outer')
 print("all merged titles length: ", len(matching))
                     
-matching = matching[~matching["DRM"].isna()] #select only rows in column 'DRM' with values-- 
+matching = matching[~matching[DRM].isna()] #select only rows in column 'DRM' with values-- 
 # only rows with matching acq record
-matching = matching.sort_values("DRM")
+matching = matching.sort_values(DRM)
 
 # add lowercase title columns for QC
 matching['Title_cda'] = matching['Title_y'].str.lower()
@@ -81,7 +88,7 @@ def flag_dif_col(df, col_1, col_2, new_col):
 flag_dif_col(matching, 'Title_cda', 'Title_ds', 'title_flag')       
 
 # save for QC and use in next script
-matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching.xlsx"))
+matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching_TEST.xlsx"))
 print("All matching length: ", len(matching))
 
 # print some stats -- could save them instead
