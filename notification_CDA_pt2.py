@@ -3,7 +3,7 @@ import os
 import sys
 
 # define variables
-term = "202402"
+term = "202401"
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
@@ -153,7 +153,23 @@ def save_cda_list(df, term_code:int, output:str, cols:list, group_cols:list, che
     print("Save cda list (should equal acq + purchased): ",len(x))
 
     x.to_excel(os.path.join(output,f'save_cda_{term_code}.xlsx'))
-# create output directory
+def remove_dupes(df, dupe_col:str, old_delim:str, new_delim:str ):
+    '''
+    df = dataframe 
+    dupe_col: string, column name of col to deduplicate
+    old_delim: delimeter that seperates values in dupe ol
+    new_delim: delimter to seperate the deduped values.
+
+    removes duplicates in columns that contain delimeter seperated strings.
+    '''
+    df[dupe_col] = df[dupe_col].str.split(old_delim)
+    for i in df.index:
+        x = df.at[i, dupe_col]
+        df.at[i, dupe_col] = list(dict.fromkeys(x))
+    for i in df.index:
+        y = df.at[i, dupe_col]
+        df.at[i, dupe_col] = new_delim.join(y)# create output directory
+
 create_dir(abs_pth, output_dir)
 
 # add license text conditional col
@@ -171,6 +187,8 @@ isbn_instr_grouped = (qc_matching.groupby(["instructor_email", "ISBN"])  # group
         .agg({'Course_Number': lambda x: "/".join(x)})
         .rename({'Course_Number': 'course_numbers'}, axis=1).reset_index())
 qc_matching = pd.merge(qc_matching, isbn_instr_grouped, how='left', on=["instructor_email", ISBN])
+# remove dupes within course_numbers column
+remove_dupes(qc_matching, 'course_numbers', '/', '/')
 
 
 # remove duplicate rows on ISBN and Instructor (instructors using the same book in mulitple sections) 
@@ -178,6 +196,7 @@ qc_matching = qc_matching.sort_values('Course_Number')
 print("Before removeing duplicate ISBN & Instructor, df len is: ",len(qc_matching))
 qc_matching = qc_matching.groupby(["instructor_email", "ISBN"]).first().reset_index()
 print("After removing dupes, df len is", len(qc_matching),'\n')
+
 
 
 # add CRN_freq and instructor_email_freq
@@ -218,6 +237,9 @@ email_list = book_list.groupby(['instructor_email','instructor_first_name', 'ins
                                 'instructor_email_freq'])[email_cols].agg(join_ch.join)
 # add a license explanation column based on license text aggregation
 conditional_col('limit_explanation', email_list, 'license_text', limit_ex_search, limit_ex_else)
+
+# remove course number dupes (again)
+remove_dupes(email_list, 'course_numbers', ";", ", ")
 # save email list (2 of 2 files used for automated emails)
 email_list.to_excel(os.path.join(output_dir_path,f'{term}_emails.xlsx'))
 
