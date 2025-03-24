@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202402" # term is used in file paths throughout
+term = "202403" # term is used in file paths throughout
 
 # define column names (UPDATE HERE)
 DRM = 'DRM' # DRM/license info column
@@ -27,8 +27,8 @@ print("DS data length: ",len(bookstore))
 #print(bookstore.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
 
 # add purchased column based on file name
-acq_own["Purchased?"] = "owned/access"
-acq_purchased["Purchased?"] = "purchased"
+acq_own["Purchased?"] = "own/access"
+acq_purchased["Purchased?"] = "yes"
 
 # clean past purchased CDA
 acq_past= acq_past.rename(columns={"Title_cda" : title})
