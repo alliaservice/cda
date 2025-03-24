@@ -3,7 +3,7 @@ import os
 import sys
 
 # define variables
-term = "202401"
+term = "202403"
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'

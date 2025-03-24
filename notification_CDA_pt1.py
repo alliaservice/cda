@@ -27,8 +27,8 @@ print("DS data length: ",len(bookstore))
 #print(bookstore.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
 
 # add purchased column based on file name
-acq_own["Purchased?"] = "own/access"
-acq_purchased["Purchased?"] = "yes"
+acq_own["Purchased?"] = "owned/access"
+acq_purchased["Purchased?"] = "purchased"
 
 # clean past purchased CDA
 acq_past= acq_past.rename(columns={"Title_cda" : title})
@@ -88,7 +88,7 @@ def flag_dif_col(df, col_1, col_2, new_col):
 flag_dif_col(matching, 'Title_cda', 'Title_ds', 'title_flag')       
 
 # save for QC and use in next script
-matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching_TEST.xlsx"))
+matching.to_excel(os.path.join(abs_pth, f"notification_{term}/{term}_merge_matching.xlsx"))
 print("All matching length: ", len(matching))
 
 # print some stats -- could save them instead

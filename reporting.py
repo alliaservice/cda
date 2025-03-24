@@ -4,7 +4,7 @@ from openpyxl import Workbook
 import sys
 
 # define variables
-term = "202402"
+term = "202403"
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 cols_to_keep = ['Term','instructor_email', 'ISBN', 'CRN', 'Title_x', 
                 'Price', 'Internal ID', 'LibSearch Link','DRM', 'Purchased?', #'removed',
