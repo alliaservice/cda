@@ -9,10 +9,10 @@ abs_pth = os.path.dirname(os.path.abspath(__file__))
 cols_to_keep = ['Term','instructor_email', 'ISBN', 'CRN', 'Title_x', 
                 'Price', 'Internal ID', 'LibSearch Link','DRM', 'Purchased?', #'removed',
                   'Term_cda']
-output_directory = f'notification_{term}/reporting_output'
+output_directory = f'notification_{term}/reporting_output_REDO'
 
 # read data
-cda = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching.xlsx"))
+cda = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching_REDO.xlsx"))
 #cda = cda.rename(columns={'flag': 'removed'}) # change name of flag to remove
 cda = cda.rename(columns={"Instructor Email": "instructor_email"}) # rename to match
 #print(cda['ISBN'])
@@ -60,4 +60,4 @@ cda = add_frq(cda, 'ISBN')
 
 # save as an excel file
 
-cda.to_excel(f'{abs_pth}/notification_{term}/reporting_output/{term}_output.xlsx')
+cda.to_excel(f'{abs_pth}/{output_directory}/{term}_output.xlsx')

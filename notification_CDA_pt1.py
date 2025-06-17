@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202403" # term is used in file paths throughout
+term = "202404" # term is used in file paths throughout
 
 # define column names (UPDATE HERE)
 DRM = 'DRM' # DRM/license info column

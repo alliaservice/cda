@@ -3,7 +3,7 @@ import os
 import sys
 
 # define variables
-term = "202403"
+term = "202404"
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
@@ -243,6 +243,10 @@ remove_dupes(email_list, 'course_numbers', ";", ", ")
 # save email list (2 of 2 files used for automated emails)
 email_list.to_excel(os.path.join(output_dir_path,f'{term}_emails.xlsx'))
 
+# Check for DS emails
+for i in email_list[instructor_email]:
+    if 'uoduckstore' in i:
+        print(f"ERROR DUCK STORE EMAIL: {i} -- MAY NEED TO RERUN SCRIPT AND MAKE SURE CLEAN WAS DELETED")
 
 # save a copy of de-duped / deleted rows
 save_deleted_rows(qc_matching, qc_matching_dupes, 
