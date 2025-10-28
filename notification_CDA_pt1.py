@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202404" # term is used in file paths throughout
+term = "test" # term is used in file paths throughout
 
 # define column names (UPDATE HERE)
 DRM = 'DRM' # DRM/license info column
@@ -33,6 +33,11 @@ acq_purchased["Purchased?"] = "purchased"
 # clean past purchased CDA
 acq_past= acq_past.rename(columns={"Title_cda" : title})
 acq_past = acq_past.loc[(acq_past["Purchased?"]!= "no")]
+
+# prevent duplicates in past cda
+acq_past = acq_past.sort_values(["Purchased?", "Term_cda"], ascending=False) # first sort so purhcased is first, then most recent term
+acq_past = acq_past.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so if there is a purchased title
+# or there is a most recent title, only that one is kept and there aren't dupes
 
 # Append acquisitions data into one dataframe
 acq = pd.concat([acq_own, acq_purchased, acq_past])

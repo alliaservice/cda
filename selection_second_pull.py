@@ -33,8 +33,7 @@ df_main = df_main[df_main["flag"].isnull()]
 print("len remove first: ", len(df_main))
 
 # prevent duplicates in past cda
-past_cda = past_cda.sort_values("Term_cda", ascending=False) # first sort so most recent term is first
-past_cda = past_cda.sort_values("Purchased?", ascending=False) # next sort so purchased is first
+past_cda = past_cda.sort_values(["Purchased?", "Term_cda"], ascending=False) # first sort so most recent term is first
 past_cda = past_cda.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so if there is a purchased title
 # or there is a most recent title, only that one is kept and there aren't dupes
 
