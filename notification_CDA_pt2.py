@@ -3,7 +3,7 @@ import os
 import sys
 
 # define variables
-term = "202404"
+term = "202501"
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
@@ -46,7 +46,7 @@ limit_ex_search = [['cop', ("A limited license means that the library wasn't abl
                    "students want guaranteed access at all times they should consider purchasing the book. "
                    "This can be an issue if you need all students to use the book in class or during open "
                    "book exams. Please reach out to the OER team if you have any questions about limited licenses.")]]
-limit_ex_else = ("An Unlimited license means that an unlimited number of students can access "
+limit_ex_else = ("An unlimited license means that an unlimited number of students can access "
                    "a book simultaneously.")
 license_search_list = [['cop', 'limited user license --', True], ['nlimited', 'unlimited user license']]
 
@@ -244,7 +244,7 @@ remove_dupes(email_list, 'course_numbers', ";", ", ")
 email_list.to_excel(os.path.join(output_dir_path,f'{term}_emails.xlsx'))
 
 # Check for DS emails
-for i in email_list[instructor_email]:
+for i in email_list.index:
     if 'uoduckstore' in i:
         print(f"ERROR DUCK STORE EMAIL: {i} -- MAY NEED TO RERUN SCRIPT AND MAKE SURE CLEAN WAS DELETED")
 
