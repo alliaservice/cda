@@ -4,7 +4,7 @@ from openpyxl import Workbook
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-term = "202404"
+term = "test"
 
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
@@ -31,6 +31,12 @@ print("len after first/second merge: ", len(df_main))
 # select only non_matching rows (ie second pull only titles)
 df_main = df_main[df_main["flag"].isnull()]
 print("len remove first: ", len(df_main))
+
+# prevent duplicates in past cda
+past_cda = past_cda.sort_values("Term_cda", ascending=False) # first sort so most recent term is first
+past_cda = past_cda.sort_values("Purchased?", ascending=False) # next sort so purchased is first
+past_cda = past_cda.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so if there is a purchased title
+# or there is a most recent title, only that one is kept and there aren't dupes
 
 # merge with past terms cda
 df_main = df_main.merge(past_cda, 
