@@ -3,8 +3,8 @@ import os
 import sys
 
 # define variables
-term = "202502y" \
-""
+term = "202502" 
+
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'notification_{term}/script2_output'
@@ -213,8 +213,8 @@ qc_matching[['instructor_last_name', 'instructor_first_name']] = qc_matching[ins
 
 # add print link conditional col to include as linked text in emails
 # rows without links must be blank
-# replace null values with spaces (for loop + groupby requires)
-qc_matching[print_link].fillna(" ", inplace=True) 
+# replace null values with spaces (for loop + groupby requires no nans)
+qc_matching[print_link] = qc_matching[print_link].fillna(" ") 
 conditional_col('print_link?', qc_matching, print_link, [['http', 'print link']], ' ')
 
 # save a full copy of cleaned up and filtered list for convinient access to full list of emails & books
@@ -226,7 +226,7 @@ save_cda_list(not_cleaned,term_int, output_dir_path, save_cda_cols, save_cda_gro
 
 # slice full data to only get columns needed for sending the emails
 book_list = qc_matching.loc[:, cols_to_keep]
-book_list = book_list.applymap(str) # avoid join error by joining ints
+book_list = book_list.astype(str) # avoid join error by joining ints
 
 # save book list (1 of 2 files used for automated emails)
 book_list.to_excel(os.path.join(output_dir_path,f'{term}_books.xlsx'))
