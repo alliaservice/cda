@@ -4,7 +4,7 @@ from openpyxl import Workbook
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-term = "test"
+term = "20250x"
 
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
@@ -44,4 +44,9 @@ df_main = df_main.merge(past_cda,
 print("past cda merge: ", len(df_main))
 print(df_main.describe(include="all"))
 
+# add ds link, must remove .0 and convert crn to int
+df_main["CRN"] = df_main["CRN"].round(0).astype('Int64') # convert crn to int for link
+df_main["Duck Store Link"]= "https://www.uoduckstore.com/book-search-results?crn=" + df_main['CRN'].astype(str) + f"&term={term}"
+
+# print(df_main[["CRN", "Duck Store Link"]].head())
 df_main.to_excel(f'{abs_pth}/{term}_selection/{term}_second_pull_output.xlsx')

@@ -4,7 +4,7 @@ from openpyxl import Workbook
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-term = "202502"
+term = "202503"
 
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
@@ -32,5 +32,9 @@ non_matching = df_main["Title_cda"].isna().sum() # add up null values in title_c
 print('non-matching titles:',non_matching )
 print('matching past terms', (len(df_main)-non_matching))
 
+# add ds link, must remove .0 and convert crn to int
+df_main["CRN"] = df_main["CRN"].round(0).astype('Int64') # convert crn to int for link
+df_main["Duck Store Link"]= "https://www.uoduckstore.com/book-search-results?crn=" + df_main['CRN'].astype(str) + f"&term={term}"
+
 # save file 
-df_main.to_excel(f'{abs_pth}/{term}_selection/{term}_first_output-sort-test-again.xlsx')
+df_main.to_excel(f'{abs_pth}/{term}_selection/{term}_first_output.xlsx')

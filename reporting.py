@@ -4,15 +4,15 @@ from openpyxl import Workbook
 import sys
 
 # define variables
-term = "202403"
+term = "202502"
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 cols_to_keep = ['Term','instructor_email', 'ISBN', 'CRN', 'Title_x', 
                 'Price', 'Internal ID', 'LibSearch Link','DRM', 'Purchased?', #'removed',
                   'Term_cda']
-output_directory = f'notification_{term}/reporting_output_REDO'
+output_directory = f'notification_{term}/reporting_output'
 
 # read data
-cda = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching_REDO.xlsx"))
+cda = pd.read_excel(os.path.join(abs_pth,f"notification_{term}/{term}_merge_matching.xlsx"))
 #cda = cda.rename(columns={'flag': 'removed'}) # change name of flag to remove
 cda = cda.rename(columns={"Instructor Email": "instructor_email"}) # rename to match
 #print(cda['ISBN'])
