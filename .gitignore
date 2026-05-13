@@ -2,5 +2,10 @@
 *.xlsx
 *.ipynb
 *.docx
+*.png
+*.jpg
 past_terms/
 **/.DS_Store
+fuzzy_test.py
+*.zip
+*.tmp
