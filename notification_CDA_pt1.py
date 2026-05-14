@@ -13,6 +13,9 @@ CRN = 'CRN' # course section unique id
 ISBN = 'ISBN'
 no_ebook = 'No eBook Allowed'
 title = "Title" 
+purchased = 'Purchased?' # controlled vocab: no, owned/access, purchased
+term_cda = 'Term_cda' # in past cda file, term purchased or first used
+title_cda = 'Title_cda' # in past cda file, title in cda program
 
 # get absolute path
 abs_pth = os.path.dirname(os.path.abspath(__file__))
@@ -27,16 +30,16 @@ print("DS data length: ",len(bookstore))
 #print(bookstore.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
 
 # add purchased column based on file name
-acq_own["Purchased?"] = "owned/access"
-acq_purchased["Purchased?"] = "purchased"
+acq_own[purchased] = "owned/access"
+acq_purchased[purchased] = "purchased"
 
 # clean past purchased CDA
-acq_past= acq_past.rename(columns={"Title_cda" : title})
-acq_past = acq_past.loc[(acq_past["Purchased?"]!= "no")]
+acq_past= acq_past.rename(columns={title_cda : title})
+acq_past = acq_past.loc[(acq_past[purchased]!= "no")]
 
 # prevent duplicates in past cda
-acq_past = acq_past.sort_values(["Purchased?", "Term_cda"], ascending=False) # first sort so purhcased is first, then most recent term
-acq_past = acq_past.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so if there is a purchased title
+acq_past = acq_past.sort_values([purchased, term_cda], ascending=False) # first sort so purhcased is first, then most recent term
+acq_past = acq_past.drop_duplicates(subset=[ISBN]) # remove dupes on ISBN so if there is a purchased title
 # or there is a most recent title, only that one is kept and there aren't dupes
 
 # Append acquisitions data into one dataframe
@@ -44,7 +47,7 @@ acq = pd.concat([acq_own, acq_purchased, acq_past])
 print("All acq length (unique books owned or purchased): ", len(acq))
 
 # fill Term_cda
-acq["Term_cda"].fillna(term, inplace=True)
+acq[term_cda].fillna(term, inplace=True)
 
 # Merge Data from Book Store with Acquisition Data
 print("DS data length: ",len(bookstore))
