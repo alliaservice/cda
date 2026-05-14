@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # define variable, CHANGE TERM
-term = "202502-test" # term is used in file paths throughout
+term = "202501" # term is used in file paths throughout
 
 # define column names (UPDATE HERE)
 DRM = 'DRM' # DRM/license info column
@@ -50,8 +50,6 @@ print("All acq length (unique books owned or purchased): ", len(acq))
 acq[term_cda].fillna(term, inplace=True)
 
 # Merge Data from Book Store with Acquisition Data
-print("DS data length: ",len(bookstore))
-
 # remove no eBook Allowed titles
 bookstore = bookstore[bookstore[no_ebook] !="Yes"]
 
@@ -62,8 +60,10 @@ matching = bookstore.merge(acq,
 print("all merged titles length: ", len(matching))
                     
 matching = matching[~matching[DRM].isna()] #select only rows in column 'DRM' with values-- 
-# only rows with matching acq record
-matching = matching.sort_values(DRM)
+# only rows with matching acq record (remove bookstore records with no match in acq)
+# keep rows with CRN values OR where term_cda equals current term, remove other rows (unmatched past cda titles)
+matching = matching[(~matching[CRN].isna()) | (matching[term_cda]==term)] 
+matching = matching.sort_values(DRM) # sort by DRM
 
 # add lowercase title columns for QC
 matching['Title_cda'] = matching['Title_y'].str.lower()
