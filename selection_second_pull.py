@@ -6,6 +6,14 @@ from openpyxl import Workbook
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 term = "20250x"
 
+# define column names (UPDATE HERE)
+ISBN = 'ISBN'
+CRN = 'CRN'
+purchased = 'Purchased?' # controlled vocab: no, owned/access, purchased
+term_cda = 'Term_cda' # in past cda file, term purchased or first used in cda program
+title_cda = 'Title_cda' # in past cda file
+
+# read in data
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
 second_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/second_all_titles.xlsx"))
@@ -16,14 +24,14 @@ print("difference: ", (len(second_p) - len(first_p)))
 
 # clean up the first pull with remove titles file
 first_p['flag'] = 'y' # add simple flag column to use to exclude after merge
-first_p = first_p[["ISBN", "flag"]] # keep only a few cols
-first_p = first_p.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so merge works as expected
+first_p = first_p[[ISBN, "flag"]] # keep only a few cols
+first_p = first_p.drop_duplicates(subset=[ISBN]) # remove dupes on ISBN so merge works as expected
 
 
 # merge first_p and second_p, keep only second_pull 
 
 df_main = second_p.merge(first_p,
-                     on = "ISBN",
+                     on = ISBN,
                      how = 'left')
 
 print("len after first/second merge: ", len(df_main))
@@ -33,20 +41,20 @@ df_main = df_main[df_main["flag"].isnull()]
 print("len remove first: ", len(df_main))
 
 # prevent duplicates in past cda
-past_cda = past_cda.sort_values(["Purchased?", "Term_cda"], ascending=False) # first sort so most recent term is first
-past_cda = past_cda.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so if there is a purchased title
+past_cda = past_cda.sort_values([purchased, term_cda], ascending=False) # first sort so most recent term is first
+past_cda = past_cda.drop_duplicates(subset=[ISBN]) # remove dupes on ISBN so if there is a purchased title
 # or there is a most recent title, only that one is kept and there aren't dupes
 
 # merge with past terms cda
 df_main = df_main.merge(past_cda, 
-                        on = "ISBN",
+                        on = ISBN,
                         how = 'left')
 print("past cda merge: ", len(df_main))
 print(df_main.describe(include="all"))
 
 # add ds link, must remove .0 and convert crn to int
-df_main["CRN"] = df_main["CRN"].round(0).astype('Int64') # convert crn to int for link
-df_main["Duck Store Link"]= "https://www.uoduckstore.com/book-search-results?crn=" + df_main['CRN'].astype(str) + f"&term={term}"
+df_main[CRN] = df_main[CRN].round(0).astype('Int64') # convert crn to int for link
+df_main["Duck Store Link"]= "https://www.uoduckstore.com/book-search-results?crn=" + df_main[CRN].astype(str) + f"&term={term}"
 
 # print(df_main[["CRN", "Duck Store Link"]].head())
 df_main.to_excel(f'{abs_pth}/{term}_selection/{term}_second_pull_output.xlsx')

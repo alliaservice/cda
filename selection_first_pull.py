@@ -11,12 +11,8 @@ first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_tit
 
 # prevent duplicates in past cda
 past_cda = past_cda.sort_values(["Purchased?", "Term_cda"], ascending=False) # first sort so most recent term is first
-#test=past_cda[["Term_cda", "Purchased?"]]
-#test.to_excel(f'{abs_pth}/{term}_selection/test1.xlsx')
-#past_cda = past_cda.sort_values("Purchased?", ascending=False) # next sort so purchased is first
 past_cda = past_cda.drop_duplicates(subset=['ISBN']) # remove dupes on ISBN so if there is a purchased title
 # or there is a most recent title, only that one is kept and there aren't dupes
-#print(past_cda["Purchased?"])
 
 print("first pull: ", len(first_p))
 
