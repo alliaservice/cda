@@ -134,7 +134,8 @@ def save_deleted_rows(df_removed, df_dupes, cols:list, path, file_name:str):
     df_removed = df_removed.loc[:, cols]
     df_dupes = pd.merge(df_dupes, df_removed,
                         how='outer', on=cols, indicator=True )
-    df_dupes = df_dupes.groupby('_merge').get_group('left_only')
+    df_dupes = df_dupes.groupby('_merge', observed=True).get_group('left_only')
+    # added observed=True to groupby to avoid warning.
     df_dupes.to_excel(os.path.join(path, file_name))
 def save_cda_list(df, term_code:int, output:str, cols:list, group_cols:list, check_col:str):
     '''

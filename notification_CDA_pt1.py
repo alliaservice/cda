@@ -47,7 +47,7 @@ acq = pd.concat([acq_own, acq_purchased, acq_past])
 print("All acq length (unique books owned or purchased): ", len(acq))
 
 # fill Term_cda
-acq[term_cda].fillna(term, inplace=True)
+acq[term_cda] = acq[term_cda].fillna(float(term)) # fill null values in term_cda with current term, convert to float
 
 # Merge Data from Book Store with Acquisition Data
 # remove no eBook Allowed titles
