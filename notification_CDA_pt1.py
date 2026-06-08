@@ -27,6 +27,7 @@ acq_past = pd.read_excel(os.path.join(abs_pth, "all_titles_purchased_not_purchas
 bookstore = pd.read_excel(os.path.join(abs_pth, f"notification_{term}/{term}_full_ds.xlsx"))
 print("DS data length: ",len(bookstore))
 
+# print col names, uncomment to use.
 #print(bookstore.keys(), acq_own.keys(), acq_purchased.keys(), acq_past.keys()) # prints all column names for error checking
 
 # add purchased column based on file name

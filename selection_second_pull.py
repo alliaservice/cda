@@ -1,14 +1,14 @@
 import os
 import pandas as pd
-from openpyxl import Workbook
+#from openpyxl import Workbook
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
 term = "20250x"
 
 # define column names (UPDATE HERE)
-ISBN = 'ISBN'
-CRN = 'CRN'
+ISBN = 'ISBN' # in booklist file and past cda file
+CRN = 'CRN' # in booklist file
 purchased = 'Purchased?' # controlled vocab: no, owned/access, purchased
 term_cda = 'Term_cda' # in past cda file, term purchased or first used in cda program
 title_cda = 'Title_cda' # in past cda file
@@ -17,6 +17,8 @@ title_cda = 'Title_cda' # in past cda file
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx"))
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx"))
 second_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/second_all_titles.xlsx"))
+
+#print(past_cda.keys(), first_p.keys(), second_p.keys()) # print column names of all input files.
 
 print("first pull: ", len(first_p))
 print("second pull: ",len(second_p))
