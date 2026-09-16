@@ -3,7 +3,7 @@ import os
 import sys
 
 # define variables
-term = "202502" 
+term = "202501" 
 
 term_int = int(term)
 abs_pth = os.path.dirname(os.path.abspath(__file__))
@@ -219,7 +219,15 @@ qc_matching[print_link] = qc_matching[print_link].fillna(" ")
 conditional_col('print_link?', qc_matching, print_link, [['http', 'print link']], ' ')
 
 # save a full copy of cleaned up and filtered list for convinient access to full list of emails & books
-qc_matching.to_excel(os.path.join(output_dir_path,'deduped_titles_full.xlsx'))
+save_full_dedupe = qc_matching[['instructor_email', 'ISBN', 'Term', 'Dept', 'Sec', 'CRN', 'Title_x',
+       'Author', 'Publisher', 'Ed.', 'Price', 'N Price', 'U Price', 'eBook',
+       'Req', 'Instructor', 'Class Notes', 'Internal ID',
+       'Title_y', 'LibSearch Link', 'print_libsearch_link',
+       'DRM']] # keep only cols for course reserves
+#print(save_full_dedupe.columns)
+# rename cols for course reserves
+save_full_dedupe = save_full_dedupe.rename(columns={"Title_x": "duck_store_title", "Title_y": "library_title"})
+save_full_dedupe.to_excel(os.path.join(output_dir_path,'deduped_titles_full.xlsx'))
 
 # save a clean list of the newly purchased and newly discovered titles to add to purchased_not_purchased
 # identical to acquisitions list, but nicely pre-formatted. 
