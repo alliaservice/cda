@@ -4,7 +4,7 @@ import pandas as pd
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-term = "20250x"
+term = "202601"
 
 # define column names (UPDATE HERE)
 ISBN = 'ISBN' # in booklist file and past cda file

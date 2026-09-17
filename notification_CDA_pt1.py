@@ -62,7 +62,7 @@ print("all merged titles length: ", len(matching))
                     
 matching = matching[~matching[DRM].isna()] #select only rows in column 'DRM' with values-- 
 # only rows with matching acq record (remove bookstore records with no match in acq)
-# keep rows with CRN values OR where term_cda equals current term, remove other rows (unmatched past cda titles)
+# keep rows with CRN values (with booklist data) OR where term_cda equals current term, remove other rows (unmatched past cda titles)
 matching = matching[(~matching[CRN].isna()) | (matching[term_cda]==term)] 
 matching = matching.sort_values(DRM) # sort by DRM
 

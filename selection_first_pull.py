@@ -4,16 +4,16 @@ import pandas as pd
 
 # define variables and read data 
 abs_pth = os.path.dirname(os.path.abspath(__file__))
-term = "202601"
+term = "202506"
 
 # read in data
 past_cda = pd.read_excel(os.path.join(abs_pth,f"all_titles_purchased_not_purchased.xlsx")) # list of all titles used in cda 
 first_p = pd.read_excel(os.path.join(abs_pth,f"{term}_selection/ds_first_all_titles.xlsx")) # current term book list
 
 # define column names (UPDATE HERE)
-ISBN = 'ISBN'
-CRN = 'CRN'
-purchased = 'Purchased?' # controlled vocab: no, owned/access, purchased
+ISBN = 'ISBN' # in booklist file and past cda file
+CRN = 'CRN' # in booklist file
+purchased = 'Purchased?' # in past cda file, controlled vocab: no, owned/access, purchased
 term_cda = 'Term_cda' # in past cda file, term purchased or first used in cda program
 title_cda = 'Title_cda' # in past cda file
 
@@ -21,6 +21,8 @@ title_cda = 'Title_cda' # in past cda file
 past_cda = past_cda.sort_values([purchased, term_cda], ascending=False) # first sort so most recent term is first
 past_cda = past_cda.drop_duplicates(subset=[ISBN]) # remove dupes on ISBN so if there is a purchased title
 # or there is a most recent title, only that one is kept and there aren't dupes
+
+#print(past_cda.keys(), first_p.keys()) # print column names of all input files.
 
 print("first pull: ", len(first_p))
 
